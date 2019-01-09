@@ -1,0 +1,31 @@
+service: ws-example
+
+plugins:
+  - serverless-websockets-plugin
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  region: eu-west-1
+  stage: dev
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - "execute-api:ManageConnections"
+      Resource:
+        - "arn:aws:execute-api:*:*:**/@connections/*"
+
+  websocketApiRouteSelectionExpression: $request.body.message
+
+functions:
+  handler:
+    handler: src/index.handler
+    events:
+      - websocket:
+          routeKey: $connect
+      - websocket:
+          routeKey: $disconnect
+      - websocket:
+          routeKey: $default
+      - websocket:
+          routeKey: message
