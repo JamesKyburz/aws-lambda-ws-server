@@ -1,6 +1,6 @@
 {
   "name": "aws-lambda-ws-server",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "websocket server for aws lambda and local development",
   "main": "src/index.js",
   "keywords": [
