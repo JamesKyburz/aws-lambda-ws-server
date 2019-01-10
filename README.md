@@ -6,6 +6,8 @@
 [![downloads](https://img.shields.io/npm/dm/aws-lambda-ws-server.svg)](https://npmjs.org/package/aws-lambda-ws-server)
 [![Greenkeeper badge](https://badges.greenkeeper.io/JamesKyburz/aws-lambda-ws-server.svg)](https://greenkeeper.io/)
 
+<a href="https://asciinema.org/a/220699?autoplay=1&speed=4&size=small&preload=1"><img src="https://asciinema.org/a/220699.png" width="380"/></a>
+
 aws lambda websocket server.
 
 ### usage
