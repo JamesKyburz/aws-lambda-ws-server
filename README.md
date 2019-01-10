@@ -1,5 +1,7 @@
 # aws-lambda-ws-server
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/JamesKyburz/aws-lambda-ws-server.svg)](https://greenkeeper.io/)
+
 aws lambda websocket server.
 
 ### usage
