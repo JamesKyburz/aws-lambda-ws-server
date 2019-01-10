@@ -2,7 +2,6 @@ const WebSocket = require('ws')
 const mappingKey = process.env.MAPPING_KEY || 'message'
 const wss = new WebSocket.Server({
   port: process.env.PORT || 5000,
-  clientTracking: false,
   verifyClient (info, fn) {
     wss.emit('verifyClient', info, fn)
   }
@@ -22,7 +21,11 @@ const context = () => ({
   async postToConnection (payload, connectionId) {
     return new Promise((resolve, reject) => {
       const ws = clients[connectionId]
-      if (!ws) return reject(new Error(`no client with ${connectionId} found`))
+      if (!ws) {
+        const err = new Error(`no client with ${connectionId} found`)
+        err.statusCode = 410
+        return reject(err)
+      }
       ws.send(JSON.stringify(payload), err => {
         if (err) return reject(err)
         resolve()
@@ -32,6 +35,7 @@ const context = () => ({
 })
 
 module.exports = handler => {
+  wss.removeAllListeners('verifyClient')
   wss.on('verifyClient', async (info, fn) => {
     const connectionId = info.req.headers['sec-websocket-key']
     try {
@@ -45,6 +49,7 @@ module.exports = handler => {
       fn(false, e.statusCode)
     }
   })
+  wss.removeAllListeners('connection')
   wss.on('connection', (ws, request) => {
     const connectionId = request.headers['sec-websocket-key']
     clients[connectionId] = ws
@@ -77,3 +82,6 @@ module.exports = handler => {
     })
   })
 }
+
+module.exports.wss = wss
+
