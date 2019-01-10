@@ -116,7 +116,72 @@ test('broadcast', t => {
   const ws1 = new WebSocket('ws://localhost:5000')
   ws1.on('open', () => ws1.send('{"message": "broadcast"}'))
   ws1.on('message', message => t.equals('{"message":"hi"}', message))
+})
 
+test('no querystring', t => {
+  t.plan(2)
+  wss(
+    wss.handler({
+      async connect ({ event }) {
+        t.notOk(event.multiValueQueryStringParameters)
+        return { statusCode: 200 }
+      }
+    })
+  )
+  new WebSocket('ws://localhost:5000')
+  .on('open', () => t.ok('websocket connection established'))
+})
+
+test('querystring /?x=42', t => {
+  t.plan(2)
+  wss(
+    wss.handler({
+      async connect ({ event }) {
+        t.deepEquals(event.multiValueQueryStringParameters, {
+          x: ['42']
+        })
+        return { statusCode: 200 }
+      }
+    })
+  )
+  new WebSocket('ws://localhost:5000/?x=42')
+  .on('open', () => t.ok('websocket connection established'))
+})
+
+test('querystring /?x=1&x=2', t => {
+  t.plan(2)
+  wss(
+    wss.handler({
+      async connect ({ event }) {
+        t.deepEquals(event.multiValueQueryStringParameters, {
+          x: ['1', '2']
+        })
+        return { statusCode: 200 }
+      }
+    })
+  )
+  new WebSocket('ws://localhost:5000/?x=1&x=2')
+  .on('open', () => t.ok('websocket connection established'))
+})
+
+test('headers', t => {
+  t.plan(3)
+  wss(
+    wss.handler({
+      async connect ({ event }) {
+        t.deepEquals(['42'], event.multiValueHeaders['x-custom'])
+        t.deepEquals(['a=1', 'b=2'], event.multiValueHeaders['cookie'])
+        return { statusCode: 200 }
+      }
+    })
+  )
+  new WebSocket('ws://localhost:5000', {
+    headers: {
+      'x-custom': '42',
+      cookie: 'a=1;b=2'
+    }
+  })
+  .on('open', () => t.ok('websocket connection established'))
 })
 
 test('terminate', t => {

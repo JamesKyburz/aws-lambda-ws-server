@@ -1,4 +1,5 @@
 const WebSocket = require('ws')
+const querystring = require('querystring')
 const mappingKey = process.env.MAPPING_KEY || 'message'
 const wss = new WebSocket.Server({
   port: process.env.PORT || 5000,
@@ -9,8 +10,36 @@ const wss = new WebSocket.Server({
 
 const clients = {}
 
-const event = (routeKey, eventType, connectionId, body = '') => ({
-  requestContext: { routeKey, eventType, connectionId },
+const queryStringBuilder = ({ url }) => {
+  const result = querystring.parse(url.split('?')[1])
+  const keys = Object.keys(result)
+  return keys.length === 0
+    ? undefined
+    : keys.reduce((sum, key) => {
+      sum[key] = Array.isArray(result[key]) ? result[key] : [result[key]]
+      return sum
+    }, {})
+}
+
+const headerBuilder = ({ headers }) => {
+  const keys = Object.keys(headers)
+  return keys.length === 0
+    ? undefined
+    : keys.reduce((sum, key) => {
+      const value = headers[key].split(key === 'cookie' ? ';' : ',')
+      sum[key] = value
+      return sum
+    }, {})
+}
+
+const event = (routeKey, eventType, req, body = '') => ({
+  requestContext: {
+    routeKey,
+    eventType,
+    connectionId: req.headers['sec-websocket-key']
+  },
+  multiValueQueryStringParameters: queryStringBuilder(req),
+  multiValueHeaders: headerBuilder(req),
   body
 })
 
@@ -37,12 +66,9 @@ const context = () => ({
 module.exports = handler => {
   wss.removeAllListeners('verifyClient')
   wss.on('verifyClient', async (info, fn) => {
-    const connectionId = info.req.headers['sec-websocket-key']
+    const req = info.req
     try {
-      const result = await handler(
-        event('$connect', 'CONNECT', connectionId),
-        context()
-      )
+      const result = await handler(event('$connect', 'CONNECT', req), context())
       fn(result && result.statusCode === 200, result.statusCode)
     } catch (e) {
       console.error(e)
@@ -50,16 +76,13 @@ module.exports = handler => {
     }
   })
   wss.removeAllListeners('connection')
-  wss.on('connection', (ws, request) => {
-    const connectionId = request.headers['sec-websocket-key']
+  wss.on('connection', (ws, req) => {
+    const connectionId = req.headers['sec-websocket-key']
     clients[connectionId] = ws
     ws.on('close', async () => {
       try {
         delete clients[connectionId]
-        await handler(
-          event('$disconnect', 'DISCONNECT', connectionId),
-          context()
-        )
+        await handler(event('$disconnect', 'DISCONNECT', req), context())
       } catch (e) {
         console.error(e)
       }
@@ -68,12 +91,7 @@ module.exports = handler => {
       try {
         const body = JSON.parse(message)
         await handler(
-          event(
-            body[mappingKey] || '$default',
-            'MESSAGE',
-            connectionId,
-            message
-          ),
+          event(body[mappingKey] || '$default', 'MESSAGE', req, message),
           context()
         )
       } catch (e) {
@@ -84,4 +102,3 @@ module.exports = handler => {
 }
 
 module.exports.wss = wss
-
