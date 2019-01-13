@@ -1,5 +1,5 @@
 const isLambda = require('is-lambda')
-const postToConnection = require('./post-to-connection')
+const postToConnection = require('aws-post-to-connection')
 
 module.exports = routes => async (event, context) => {
   if (isLambda) context.postToConnection = postToConnection(event)

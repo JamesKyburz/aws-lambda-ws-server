@@ -1,0 +1,27 @@
+{
+  "name": "aws-post-to-connection",
+  "version": "0.0.5",
+  "description": "post to a connected websocket client via api gateway",
+  "main": "src/index.js",
+  "keywords": [
+    "aws",
+    "lambda",
+    "websocket",
+    "api-gateway"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jameskyburz/aws-lambda-ws-server.git"
+  },
+  "author": {
+    "name": "James Kyburz",
+    "email": "james.kyburz@gmail.com"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "aws4": "1.8.0"
+  },
+  "license": "Apache-2.0"
+}

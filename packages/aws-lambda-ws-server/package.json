@@ -1,0 +1,35 @@
+{
+  "name": "aws-lambda-ws-server",
+  "version": "0.0.5",
+  "description": "websocket server for aws lambda and local development",
+  "main": "src/index.js",
+  "keywords": [
+    "aws",
+    "lambda",
+    "websocket",
+    "api-gateway"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jameskyburz/aws-lambda-ws-server.git"
+  },
+  "author": {
+    "name": "James Kyburz",
+    "email": "james.kyburz@gmail.com"
+  },
+  "scripts": {
+    "test": "tap test/*.js"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "aws-post-to-connection": "0.0.5",
+    "is-lambda": "1.0.1"
+  },
+  "devDependencies": {
+    "tap": "12.1.1",
+    "ws": "6.1.2"
+  },
+  "license": "Apache-2.0"
+}

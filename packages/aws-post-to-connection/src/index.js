@@ -1,19 +1,22 @@
 const aws4 = require('aws4')
-const http = require('https')
+const https = require('https')
+const http = require('http')
 const region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION
 
 module.exports = event => async (message, connectionId) => {
-  const { stage, apiId } = event.requestContext
+  const { stage, domainName, secure = true } = event.requestContext
+    ? event.requestContext
+    : event
   const { host, path, method, headers, body } = aws4.sign({
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    host: `${apiId}.execute-api.${region}.amazonaws.com`,
+    host: domainName,
     path: `/${stage}/%40connections/${encodeURIComponent(connectionId)}`,
     body: JSON.stringify(message)
   })
 
   return new Promise((resolve, reject) => {
-    const post = http.request(
+    const post = (secure ? https : http).request(
       {
         host,
         method,
