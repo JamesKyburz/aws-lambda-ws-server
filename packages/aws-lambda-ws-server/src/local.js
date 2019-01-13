@@ -1,8 +1,42 @@
 const WebSocket = require('ws')
 const querystring = require('querystring')
 const mappingKey = process.env.MAPPING_KEY || 'message'
+const http = require('http')
+
+const server = http
+  .createServer((req, res) => {
+    const connectionId = req.url.split('%40connections/')[1]
+    if (!connectionId) {
+      res.writeHead(404)
+      res.end()
+      return
+    }
+    let payload = ''
+    req.on('data', chunk => {
+      payload += chunk
+    })
+    req.on('end', () => {
+      const ws = clients[decodeURIComponent(connectionId)]
+      if (!ws) {
+        res.writeHead(410)
+        res.end()
+        return
+      }
+      ws.send(payload, err => {
+        if (err) {
+          console.error(err)
+          res.writeHead(500)
+          res.end()
+        } else {
+          res.end()
+        }
+      })
+    })
+  })
+  .listen(process.env.PORT || 5000)
+
 const wss = new WebSocket.Server({
-  port: process.env.PORT || 5000,
+  server,
   verifyClient (info, fn) {
     wss.emit('verifyClient', info, fn)
   }
@@ -102,3 +136,4 @@ module.exports = handler => {
 }
 
 module.exports.wss = wss
+module.exports.server = server

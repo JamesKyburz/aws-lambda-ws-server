@@ -27,6 +27,7 @@ await postToConnection({ message: 'hello' }, 'connectionId')
 const postToLocalhost = PostToConnection({
   stage: 'stage',
   domainName: 'localhost',
+  port: 5000,
   secure: false
 })
 await postToConnection({ message: 'hello' }, 'connectionId')

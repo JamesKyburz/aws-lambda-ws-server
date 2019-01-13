@@ -7,6 +7,7 @@ module.exports = event => async (message, connectionId) => {
   const { stage, domainName, secure = true } = event.requestContext
     ? event.requestContext
     : event
+  const port = event.port || (secure ? 443 : 80)
   const { host, path, method, headers, body } = aws4.sign({
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -19,6 +20,7 @@ module.exports = event => async (message, connectionId) => {
     const post = (secure ? https : http).request(
       {
         host,
+        port,
         method,
         path,
         headers

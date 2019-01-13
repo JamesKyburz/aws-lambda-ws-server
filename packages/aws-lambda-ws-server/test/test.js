@@ -1,5 +1,6 @@
 const { test } = require('tap')
 
+const PostToConnection = require('../../aws-post-to-connection')
 const wss = require('..')
 const WebSocket = require('ws')
 
@@ -128,8 +129,9 @@ test('no querystring', t => {
       }
     })
   )
-  new WebSocket('ws://localhost:5000')
-  .on('open', () => t.ok('websocket connection established'))
+  new WebSocket('ws://localhost:5000').on('open', () =>
+    t.ok('websocket connection established')
+  )
 })
 
 test('querystring /?x=42', t => {
@@ -144,8 +146,9 @@ test('querystring /?x=42', t => {
       }
     })
   )
-  new WebSocket('ws://localhost:5000/?x=42')
-  .on('open', () => t.ok('websocket connection established'))
+  new WebSocket('ws://localhost:5000/?x=42').on('open', () =>
+    t.ok('websocket connection established')
+  )
 })
 
 test('querystring /?x=1&x=2', t => {
@@ -160,8 +163,9 @@ test('querystring /?x=1&x=2', t => {
       }
     })
   )
-  new WebSocket('ws://localhost:5000/?x=1&x=2')
-  .on('open', () => t.ok('websocket connection established'))
+  new WebSocket('ws://localhost:5000/?x=1&x=2').on('open', () =>
+    t.ok('websocket connection established')
+  )
 })
 
 test('headers', t => {
@@ -180,11 +184,73 @@ test('headers', t => {
       'x-custom': '42',
       cookie: 'a=1;b=2'
     }
+  }).on('open', () => t.ok('websocket connection established'))
+})
+
+test('post to connection', t => {
+  t.plan(3)
+  const clients = {}
+  const postToLocal = PostToConnection({
+    stage: 'dev',
+    secure: false,
+    domainName: 'localhost',
+    port: 5000
   })
-  .on('open', () => t.ok('websocket connection established'))
+  wss(
+    wss.handler({
+      async connect ({ id }) {
+        clients[id] = id
+        return { statusCode: 200 }
+      }
+    })
+  )
+
+  const onOpen = () => {
+    if (Object.keys(clients).length === 3) {
+      for (const client of Object.keys(clients)) {
+        postToLocal({ message: 'hi' }, client).catch(console.error)
+      }
+    }
+  }
+
+  const ws3 = new WebSocket('ws://localhost:5000')
+  ws3.on(
+    'message',
+    message => t.equals('{"message":"hi"}', message) && ws3.close()
+  )
+  ws3.on('open', onOpen)
+
+  const ws2 = new WebSocket('ws://localhost:5000')
+  ws2.on(
+    'message',
+    message => t.equals('{"message":"hi"}', message) && ws2.close()
+  )
+  ws2.on('open', onOpen)
+
+  const ws1 = new WebSocket('ws://localhost:5000')
+  ws1.on(
+    'message',
+    message => t.equals('{"message":"hi"}', message) && ws1.close()
+  )
+  ws1.on('open', onOpen)
+})
+
+test('post to non existent connection', t => {
+  t.plan(1)
+  const postToLocal = PostToConnection({
+    stage: 'dev',
+    secure: false,
+    domainName: 'localhost',
+    port: 5000
+  })
+
+  postToLocal({ message: 'hi' }, 'x').catch(err => {
+    t.equals('invalid status 410', err.message)
+  })
 })
 
 test('terminate', t => {
   wss.wss.close()
+  wss.server.close()
   t.end()
 })
