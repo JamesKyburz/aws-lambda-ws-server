@@ -1,6 +1,6 @@
 {
   "name": "aws-post-to-connection",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "post to a connected websocket client via api gateway",
   "main": "src/index.js",
   "keywords": [
