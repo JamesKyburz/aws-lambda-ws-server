@@ -205,33 +205,26 @@ test('post to connection', t => {
     })
   )
 
+  let pending = 3
+
   const onOpen = () => {
-    if (Object.keys(clients).length === 3) {
+    pending--
+    if (!pending) {
       for (const client of Object.keys(clients)) {
         postToLocal({ message: 'hi' }, client).catch(console.error)
       }
     }
   }
-
   const ws3 = new WebSocket('ws://localhost:5000')
-  ws3.on(
-    'message',
-    message => t.equals('{"message":"hi"}', message) && ws3.close()
-  )
+  ws3.on('message', message => t.equals('{"message":"hi"}', message))
   ws3.on('open', onOpen)
 
   const ws2 = new WebSocket('ws://localhost:5000')
-  ws2.on(
-    'message',
-    message => t.equals('{"message":"hi"}', message) && ws2.close()
-  )
+  ws2.on('message', message => t.equals('{"message":"hi"}', message))
   ws2.on('open', onOpen)
 
   const ws1 = new WebSocket('ws://localhost:5000')
-  ws1.on(
-    'message',
-    message => t.equals('{"message":"hi"}', message) && ws1.close()
-  )
+  ws1.on('message', message => t.equals('{"message":"hi"}', message))
   ws1.on('open', onOpen)
 })
 
@@ -244,7 +237,7 @@ test('post to non existent connection', t => {
     port: 5000
   })
 
-  postToLocal({ message: 'hi' }, 'x').catch(err => {
+  postToLocal({ message: 'hello' }, 'x').catch(err => {
     t.equals('invalid status 410', err.message)
   })
 })
