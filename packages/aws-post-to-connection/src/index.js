@@ -1,7 +1,6 @@
 const aws4 = require('aws4')
 const https = require('https')
 const http = require('http')
-const region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION
 
 module.exports = event => async (message, connectionId) => {
   const { stage, domainName, secure = true } = event.requestContext
