@@ -1,8 +1,5 @@
 service: ws-example
 
-plugins:
-  - serverless-websockets-plugin
-
 provider:
   name: aws
   runtime: nodejs8.10
