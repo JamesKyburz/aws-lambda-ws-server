@@ -28,8 +28,8 @@
     "is-lambda": "1.0.1"
   },
   "devDependencies": {
-    "tap": "12.1.1",
-    "ws": "6.1.2"
+    "tap": "14.10.5",
+    "ws": "7.2.1"
   },
   "license": "Apache-2.0"
 }
