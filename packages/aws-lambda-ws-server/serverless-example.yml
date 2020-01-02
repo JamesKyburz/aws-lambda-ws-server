@@ -12,7 +12,7 @@ provider:
       Resource:
         - "arn:aws:execute-api:*:*:**/@connections/*"
 
-  websocketApiRouteSelectionExpression: $request.body.message
+  websocketsApiRouteSelectionExpression: $request.body.message
 
 functions:
   handler:
@@ -23,6 +23,5 @@ functions:
       - websocket:
           routeKey: $disconnect
       - websocket:
-          routeKey: $default
-      - websocket:
-          routeKey: message
+          routeKey: echo
+      - websocket: $default
