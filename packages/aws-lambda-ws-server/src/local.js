@@ -50,9 +50,9 @@ const queryStringBuilder = ({ url }) => {
   return keys.length === 0
     ? undefined
     : keys.reduce((sum, key) => {
-      sum[key] = Array.isArray(result[key]) ? result[key] : [result[key]]
-      return sum
-    }, {})
+        sum[key] = Array.isArray(result[key]) ? result[key] : [result[key]]
+        return sum
+      }, {})
 }
 
 const headerBuilder = ({ headers }) => {
@@ -60,10 +60,10 @@ const headerBuilder = ({ headers }) => {
   return keys.length === 0
     ? undefined
     : keys.reduce((sum, key) => {
-      const value = headers[key].split(key === 'cookie' ? ';' : ',')
-      sum[key] = value
-      return sum
-    }, {})
+        const value = headers[key].split(key === 'cookie' ? ';' : ',')
+        sum[key] = value
+        return sum
+      }, {})
 }
 
 const event = (routeKey, eventType, req, body = '') => ({
@@ -123,7 +123,7 @@ module.exports = handler => {
     })
     ws.on('message', async message => {
       try {
-        const body = JSON.parse(message)
+        const body = JSON.parse(message || '{}')
         await handler(
           event(body[mappingKey] || '$default', 'MESSAGE', req, message),
           context()
