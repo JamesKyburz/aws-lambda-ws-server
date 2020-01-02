@@ -15,7 +15,10 @@ module.exports = routes => async (event, context) => {
     return routes.disconnect(connectionArgs)
   } else if (eventType === 'MESSAGE') {
     const body = JSON.parse(
-      Buffer.from(event.body, event.isBase64Encoded ? 'base64' : undefined)
+      Buffer.from(
+        event.body || '{}',
+        event.isBase64Encoded ? 'base64' : undefined
+      )
     )
     const messageArgs = { ...connectionArgs, message: body }
     if (routes[routeKey]) {
