@@ -25,11 +25,11 @@
   ],
   "dependencies": {
     "aws-post-to-connection": "0.1.7",
-    "is-lambda": "1.0.1"
+    "is-lambda": "1.0.1",
+    "ws": "7.2.1"
   },
   "devDependencies": {
-    "tap": "14.10.5",
-    "ws": "7.2.1"
+    "tap": "14.10.5"
   },
   "license": "Apache-2.0"
 }
