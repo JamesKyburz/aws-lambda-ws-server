@@ -3,6 +3,7 @@ const { test } = require('tap')
 const PostToConnection = require('../../aws-post-to-connection')
 const wss = require('..')
 const WebSocket = require('ws')
+const http = require('http')
 
 test('send ok connection', t => {
   t.plan(2)
@@ -24,6 +25,20 @@ test('send bad connection', t => {
     wss.handler({
       async connect () {
         return { statusCode: 401 }
+      }
+    })
+  )
+  const ws = new WebSocket('ws://localhost:5000')
+  ws.on('open', () => t.fail('websocket connection established'))
+  ws.on('error', () => t.ok('websocket connection not allowed'))
+})
+
+test('failure in connect', t => {
+  t.plan(1)
+  wss(
+    wss.handler({
+      async connect () {
+        throw new Error('connect failed')
       }
     })
   )
@@ -60,18 +75,80 @@ test('send default', t => {
   ws.on('open', () => ws.send('{}'))
 })
 
-test('send message', t => {
-  t.plan(1)
+test('default handlers', t => {
+  t.plan(3)
   wss(
     wss.handler({
-      async message ({ id }) {
+      async connect ({ id }) {
+        t.ok(id)
+        return { statusCode: 200 }
+      },
+      async disconnect ({ id }) {
+        t.ok(id)
+        return { statusCode: 200 }
+      },
+      async default ({ id }) {
         t.ok(id)
         return { statusCode: 200 }
       }
     })
   )
   const ws = new WebSocket('ws://localhost:5000')
-  ws.on('open', () => ws.send('{"message": "message"}'))
+  ws.on('open', () => {
+    ws.send('{}', () => ws.close())
+  })
+})
+
+test('disconnect handles failure', t => {
+  t.plan(1)
+  wss(
+    wss.handler({
+      async disconnect ({ id }) {
+        throw new Error('failed in disconnect')
+      }
+    })
+  )
+  const ws = new WebSocket('ws://localhost:5000')
+  ws.on('open', () => ws.close())
+  ws.on('close', () => t.ok('closed'))
+})
+
+test('get remaining time is a function', t => {
+  t.plan(1)
+  wss(
+    wss.handler({
+      async default ({ id, context }) {
+        t.equals(context.getRemainingTimeInMillis(), 10000)
+        return { statusCode: 200 }
+      }
+    })
+  )
+  const ws = new WebSocket('ws://localhost:5000')
+  ws.on('open', () => ws.send('{}'))
+})
+
+test('send blank message', t => {
+  t.plan(1)
+  wss(
+    wss.handler({
+      async default ({ id }) {
+        t.ok(id)
+        return { statusCode: 200 }
+      }
+    })
+  )
+  const ws = new WebSocket('ws://localhost:5000')
+  ws.on('open', () => ws.send(''))
+})
+
+test('no default handler', t => {
+  t.plan(1)
+  wss(
+    wss.handler({
+    })
+  )
+  const ws = new WebSocket('ws://localhost:5000')
+  ws.on('open', () => ws.send('', err => t.error(err)))
 })
 
 test('reply', t => {
@@ -88,6 +165,21 @@ test('reply', t => {
   const ws = new WebSocket('ws://localhost:5000')
   ws.on('open', () => ws.send('{"message": "message"}'))
   ws.on('message', message => t.equals('{"message":"hi"}', message))
+})
+
+test('reply to non existent client closes connection', t => {
+  t.plan(1)
+  wss(
+    wss.handler({
+      async message ({ id, context }) {
+        const { postToConnection } = context
+        await postToConnection({ message: 'hi' }, 'non existent id')
+      }
+    })
+  )
+  const ws = new WebSocket('ws://localhost:5000')
+  ws.on('open', () => ws.send('{"message": "message"}'))
+  ws.on('close', () => t.ok('connection closed'))
 })
 
 test('broadcast', t => {
@@ -240,6 +332,22 @@ test('post to non existent connection', t => {
   postToLocal({ message: 'hello' }, 'x').catch(err => {
     t.equals('invalid status 410', err.message)
   })
+})
+
+test('web server returns 404 with non connection url post', t => {
+  t.plan(1)
+  const post = http.request(
+    {
+      host: 'localhost',
+      port: 5000,
+      method: 'POST',
+      path: '/'
+    },
+    res => {
+      t.equals(res.statusCode, 404)
+    }
+  )
+  post.end()
 })
 
 test('terminate', t => {

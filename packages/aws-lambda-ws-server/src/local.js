@@ -129,6 +129,7 @@ module.exports = handler => {
           context()
         )
       } catch (e) {
+        ws.close()
         console.error(e)
       }
     })
