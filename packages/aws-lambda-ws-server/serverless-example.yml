@@ -19,9 +19,9 @@ functions:
     handler: src/index.handler
     events:
       - websocket:
-          routeKey: $connect
+          route: $connect
       - websocket:
-          routeKey: $disconnect
+          route: $disconnect
       - websocket:
-          routeKey: echo
+          route: echo
       - websocket: $default
