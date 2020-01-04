@@ -23,5 +23,5 @@ functions:
       - websocket:
           route: $disconnect
       - websocket:
-          route: echo
+          route: message
       - websocket: $default
