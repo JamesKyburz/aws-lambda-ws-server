@@ -167,8 +167,8 @@ test('reply', t => {
   ws.on('message', message => t.equals('{"message":"hi"}', message))
 })
 
-test('reply to non existent client closes connection', t => {
-  t.plan(1)
+test('errors in message handler are sent back', t => {
+  t.plan(2)
   wss(
     wss.handler({
       async message ({ id, context }) {
@@ -179,7 +179,11 @@ test('reply to non existent client closes connection', t => {
   )
   const ws = new WebSocket('ws://localhost:5000')
   ws.on('open', () => ws.send('{"message": "message"}'))
-  ws.on('close', () => t.ok('connection closed'))
+  ws.on('message', message => {
+    message = JSON.parse(message)
+    t.ok(typeof message.connectionId === 'string')
+    t.equals(message.message, 'Internal server error')
+  })
 })
 
 test('broadcast', t => {

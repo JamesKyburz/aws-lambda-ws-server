@@ -129,8 +129,18 @@ module.exports = handler => {
           context()
         )
       } catch (e) {
-        ws.close()
         console.error(e)
+        try {
+          await context().postToConnection(
+            {
+              message: 'Internal server error',
+              connectionId
+            },
+            connectionId
+          )
+        } catch (e) {
+          console.error(e)
+        }
       }
     })
   })
