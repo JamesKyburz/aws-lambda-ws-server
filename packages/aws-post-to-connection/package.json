@@ -21,7 +21,7 @@
     "src"
   ],
   "dependencies": {
-    "aws4": "1.9.0"
+    "aws4": "1.9.1"
   },
   "license": "Apache-2.0"
 }
