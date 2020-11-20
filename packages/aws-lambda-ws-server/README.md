@@ -4,7 +4,6 @@
 [![js-standard-style](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://github.com/feross/standard)
 [![build status](https://api.travis-ci.org/JamesKyburz/aws-lambda-ws-server.svg)](https://travis-ci.org/JamesKyburz/aws-lambda-ws-server)
 [![downloads](https://img.shields.io/npm/dm/aws-lambda-ws-server.svg)](https://npmjs.org/package/aws-lambda-ws-server)
-[![Greenkeeper badge](https://badges.greenkeeper.io/JamesKyburz/aws-lambda-ws-server.svg)](https://greenkeeper.io/)
 
 <a href="https://asciinema.org/a/291478?autoplay=1&speed=1.5&size=medium&preload=1"><img src="https://asciinema.org/a/291478.svg" width="480"></a>
 

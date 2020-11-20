@@ -3,7 +3,6 @@
 [![js-standard-style](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://github.com/feross/standard)
 [![build status](https://api.travis-ci.org/JamesKyburz/aws-lambda-ws-server.svg)](https://travis-ci.org/JamesKyburz/aws-lambda-ws-server)
 [![downloads](https://img.shields.io/npm/dm/aws-post-to-connection.svg)](https://npmjs.org/package/aws-post-to-connection)
-[![Greenkeeper badge](https://badges.greenkeeper.io/JamesKyburz/aws-lambda-ws-server.svg)](https://greenkeeper.io/)
 
 post to a connected websocket client.
 
