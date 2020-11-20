@@ -1,6 +1,6 @@
 {
   "name": "aws-lambda-ws-server",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "description": "websocket server for aws lambda and local development",
   "main": "src/index.js",
   "keywords": [
@@ -24,7 +24,7 @@
     "src"
   ],
   "dependencies": {
-    "aws-post-to-connection": "0.1.20",
+    "aws-post-to-connection": "^0.1.21",
     "is-lambda": "1.0.1",
     "ws": "7.4.0"
   },
